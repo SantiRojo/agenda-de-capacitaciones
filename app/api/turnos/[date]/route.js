@@ -1,5 +1,8 @@
-import { kv } from "@vercel/kv";
+import { Redis } from "@upstash/redis";
 import { NextResponse } from "next/server";
+
+const redis = Redis.fromEnv();
+
 
 const SLOTS = ["9:30", "10:30", "11:30", "12:30", "14:30", "15:30", "16:30"];
 const RESET_HOUR = 19;
@@ -39,11 +42,11 @@ export async function GET(request, { params }) {
   const { date } = params;
   const key = `turnos:${date}`;
   try {
-    const raw = await kv.get(key);
+    const raw = await redis.get(key);
     const data = raw || emptyDay();
     const { data: resetData, changed } = applyReset(data);
     if (changed) {
-      await kv.set(key, resetData);
+      await redis.set(key, resetData);
     }
     return NextResponse.json({ date, data: resetData });
   } catch (err) {
@@ -65,7 +68,7 @@ export async function POST(request, { params }) {
       return NextResponse.json({ error: "Estado inválido" }, { status: 400 });
     }
 
-    const raw = await kv.get(key);
+    const raw = await redis.get(key);
     const current = raw || emptyDay();
     current[slot] = {
       status,
@@ -73,7 +76,7 @@ export async function POST(request, { params }) {
       offeredAt: status === "ofrecido" ? offeredAt || Date.now() : null,
     };
 
-    await kv.set(key, current);
+    await redis.set(key, current);
     return NextResponse.json({ date, data: current });
   } catch (err) {
     return NextResponse.json({ error: "No se pudo guardar el turno" }, { status: 500 });
