@@ -19,6 +19,10 @@ function emptyDay() {
   return d;
 }
 
+function emptyBlock() {
+  return { blocked: false, reason: "" };
+}
+
 function formatDateParam(date) {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
@@ -188,7 +192,177 @@ function Modal({ date, slot, dayData, onClose, onSave, saving }) {
   );
 }
 
-function DayColumn({ date, dayName, dayData, isToday, isPast, statusFilter, onSlotClick }) {
+function BlockModal({ date, blockData, onClose, onSave, saving }) {
+  const [reason, setReason] = useState(blockData.reason || "");
+  const [error, setError] = useState(false);
+
+  const dayIdx = date.getDay() - 1;
+  const dayName = DAY_NAMES[dayIdx >= 0 ? dayIdx : 6];
+  const dateStr = `${dayName} ${date.getDate()}/${date.getMonth() + 1}`;
+
+  const handleBlock = () => {
+    if (!reason.trim()) {
+      setError(true);
+      return;
+    }
+    onSave({ blocked: true, reason: reason.trim() });
+  };
+
+  const handleUnblock = () => {
+    onSave({ blocked: false, reason: "" });
+  };
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.5)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 100,
+        padding: 16,
+      }}
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div
+        style={{
+          background: "var(--modal-bg)",
+          border: "1px solid var(--border-color)",
+          borderRadius: 16,
+          padding: 24,
+          width: 320,
+          maxWidth: "100%",
+        }}
+      >
+        <div style={{ fontSize: 17, fontWeight: 500, color: "var(--text-primary)", marginBottom: 4 }}>
+          {blockData.blocked ? "Día bloqueado" : "Bloquear día"}
+        </div>
+        <div style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 20 }}>{dateStr}</div>
+
+        {blockData.blocked ? (
+          <>
+            <label style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 6, display: "block" }}>
+              Motivo actual
+            </label>
+            <div
+              style={{
+                fontSize: 14,
+                color: "var(--text-primary)",
+                background: "var(--bg-page)",
+                border: "1px solid var(--border-color)",
+                borderRadius: 8,
+                padding: "10px 10px",
+                marginBottom: 16,
+              }}
+            >
+              {blockData.reason}
+            </div>
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+              <button
+                onClick={onClose}
+                style={{
+                  padding: "9px 16px",
+                  borderRadius: 8,
+                  border: "1px solid var(--input-border)",
+                  background: "transparent",
+                  color: "var(--text-primary)",
+                  fontSize: 14,
+                  cursor: "pointer",
+                }}
+              >
+                Cerrar
+              </button>
+              <button
+                onClick={handleUnblock}
+                disabled={saving}
+                style={{
+                  padding: "9px 16px",
+                  borderRadius: 8,
+                  border: "none",
+                  background: "var(--accent-fill)",
+                  color: "#fff",
+                  fontSize: 14,
+                  fontWeight: 500,
+                  cursor: saving ? "default" : "pointer",
+                  opacity: saving ? 0.6 : 1,
+                }}
+              >
+                {saving ? "Guardando…" : "Desbloquear día"}
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <label style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 6, display: "block" }}>
+              Motivo del bloqueo
+            </label>
+            <input
+              type="text"
+              value={reason}
+              onChange={(e) => {
+                setReason(e.target.value);
+                setError(false);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleBlock();
+              }}
+              placeholder="Ej: feriado nacional"
+              maxLength={60}
+              autoFocus
+              style={{
+                width: "100%",
+                marginBottom: 16,
+                padding: "10px 10px",
+                fontSize: 16,
+                borderRadius: 8,
+                border: error ? "1px solid var(--error-text)" : "1px solid var(--input-border)",
+                background: "var(--bg-card)",
+                color: "var(--text-primary)",
+              }}
+            />
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+              <button
+                onClick={onClose}
+                style={{
+                  padding: "9px 16px",
+                  borderRadius: 8,
+                  border: "1px solid var(--input-border)",
+                  background: "transparent",
+                  color: "var(--text-primary)",
+                  fontSize: 14,
+                  cursor: "pointer",
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleBlock}
+                disabled={saving}
+                style={{
+                  padding: "9px 16px",
+                  borderRadius: 8,
+                  border: "none",
+                  background: "var(--error-text)",
+                  color: "#fff",
+                  fontSize: 14,
+                  fontWeight: 500,
+                  cursor: saving ? "default" : "pointer",
+                  opacity: saving ? 0.6 : 1,
+                }}
+              >
+                {saving ? "Guardando…" : "Bloquear día"}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function DayColumn({ date, dayName, dayData, isToday, isPast, statusFilter, blockData, onSlotClick, onBlockClick }) {
   const visibleSlots = SLOTS.filter((slot) => {
     if (statusFilter === "todos") return true;
     const s = dayData[slot] || { status: "disponible" };
@@ -241,50 +415,86 @@ function DayColumn({ date, dayName, dayData, isToday, isPast, statusFilter, onSl
         </div>
       </div>
 
-      {visibleSlots.length === 0 && (
-        <div style={{ fontSize: 12, color: "var(--text-muted)", textAlign: "center", padding: "16px 10px" }}>
-          Sin turnos en este estado
-        </div>
-      )}
+      <label
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 6,
+          padding: "8px 10px",
+          borderBottom: "1px solid var(--border-color)",
+          fontSize: 11,
+          color: blockData.blocked ? "var(--error-text)" : "var(--text-secondary)",
+          cursor: isPast ? "not-allowed" : "pointer",
+          background: blockData.blocked ? "var(--error-bg)" : "transparent",
+        }}
+      >
+        <input
+          type="checkbox"
+          checked={blockData.blocked}
+          disabled={isPast}
+          onChange={onBlockClick}
+          style={{ cursor: isPast ? "not-allowed" : "pointer" }}
+        />
+        Bloquear día
+      </label>
 
-      {visibleSlots.map((slot) => {
-        const s = dayData[slot] || { status: "disponible", legajo: "" };
-        const meta = STATUS_META[s.status];
-        return (
-          <div
-            key={slot}
-            onClick={() => !isPast && onSlotClick(slot)}
-            style={{
-              padding: "10px 10px",
-              borderBottom: "1px solid var(--border-color)",
-              cursor: isPast ? "not-allowed" : "pointer",
-            }}
-          >
-            <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text-primary)", marginBottom: 4 }}>
-              {slot} {isPast && "🔒"}
-            </div>
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 4,
-                fontSize: 11,
-                fontWeight: 500,
-                padding: "2px 8px",
-                borderRadius: 20,
-                background: meta.bg,
-                color: meta.text,
-              }}
-            >
-              <span aria-hidden="true">{meta.emoji}</span>
-              {meta.label}
-            </span>
-            {s.legajo && (
-              <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 3 }}>👤 {s.legajo}</div>
-            )}
+      {blockData.blocked ? (
+        <div style={{ padding: "16px 10px", textAlign: "center" }}>
+          <div style={{ fontSize: 22, marginBottom: 6 }}>🚫</div>
+          <div style={{ fontSize: 12, fontWeight: 500, color: "var(--error-text)", marginBottom: 4 }}>
+            Día bloqueado
           </div>
-        );
-      })}
+          <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>{blockData.reason}</div>
+        </div>
+      ) : (
+        <>
+          {visibleSlots.length === 0 && (
+            <div style={{ fontSize: 12, color: "var(--text-muted)", textAlign: "center", padding: "16px 10px" }}>
+              Sin turnos en este estado
+            </div>
+          )}
+
+          {visibleSlots.map((slot) => {
+            const s = dayData[slot] || { status: "disponible", legajo: "" };
+            const meta = STATUS_META[s.status];
+            return (
+              <div
+                key={slot}
+                onClick={() => !isPast && onSlotClick(slot)}
+                style={{
+                  padding: "10px 10px",
+                  borderBottom: "1px solid var(--border-color)",
+                  cursor: isPast ? "not-allowed" : "pointer",
+                }}
+              >
+                <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text-primary)", marginBottom: 4 }}>
+                  {slot} {isPast && "🔒"}
+                </div>
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 4,
+                    fontSize: 11,
+                    fontWeight: 500,
+                    padding: "2px 8px",
+                    borderRadius: 20,
+                    background: meta.bg,
+                    color: meta.text,
+                  }}
+                >
+                  <span aria-hidden="true">{meta.emoji}</span>
+                  {meta.label}
+                </span>
+                {s.legajo && (
+                  <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 3 }}>👤 {s.legajo}</div>
+                )}
+              </div>
+            );
+          })}
+        </>
+      )}
 
       {isPast && (
         <div
@@ -311,6 +521,8 @@ export default function Home() {
   const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
+  const [weekBlocks, setWeekBlocks] = useState({});
+  const [activeBlockModal, setActiveBlockModal] = useState(null);
   const mondayRef = useRef(monday);
   mondayRef.current = monday;
 
@@ -320,14 +532,20 @@ export default function Home() {
     if (!silent) setLoading(true);
     const dates = Array.from({ length: 5 }, (_, i) => addDays(mondayDate, i));
     try {
-      const responses = await Promise.all(
-        dates.map((date) => fetch(`/api/turnos/${formatDateParam(date)}`).then((r) => r.json()))
-      );
-      const next = {};
-      responses.forEach((res, i) => {
-        next[formatDateParam(dates[i])] = res.data || emptyDay();
+      const [turnoResponses, blockResponses] = await Promise.all([
+        Promise.all(dates.map((date) => fetch(`/api/turnos/${formatDateParam(date)}`).then((r) => r.json()))),
+        Promise.all(dates.map((date) => fetch(`/api/bloqueo/${formatDateParam(date)}`).then((r) => r.json()))),
+      ]);
+      const nextData = {};
+      turnoResponses.forEach((res, i) => {
+        nextData[formatDateParam(dates[i])] = res.data || emptyDay();
       });
-      setWeekData(next);
+      const nextBlocks = {};
+      blockResponses.forEach((res, i) => {
+        nextBlocks[formatDateParam(dates[i])] = res.data || emptyBlock();
+      });
+      setWeekData(nextData);
+      setWeekBlocks(nextBlocks);
       setErrorMsg("");
     } catch (e) {
       setErrorMsg("No se pudieron cargar los turnos. Revisá tu conexión.");
@@ -363,6 +581,27 @@ export default function Home() {
       setErrorMsg("");
     } catch (e) {
       setErrorMsg("No se pudo guardar el cambio. Probá de nuevo.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSaveBlock = async (date, { blocked, reason }) => {
+    setSaving(true);
+    const key = formatDateParam(date);
+    try {
+      const res = await fetch(`/api/bloqueo/${key}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ blocked, reason }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Error al guardar");
+      setWeekBlocks((prev) => ({ ...prev, [key]: json.data }));
+      setActiveBlockModal(null);
+      setErrorMsg("");
+    } catch (e) {
+      setErrorMsg("No se pudo guardar el bloqueo. Probá de nuevo.");
     } finally {
       setSaving(false);
     }
@@ -480,6 +719,7 @@ export default function Home() {
           {weekDates.map((date, i) => {
             const key = formatDateParam(date);
             const dayData = weekData[key] || emptyDay();
+            const blockData = weekBlocks[key] || emptyBlock();
             const isPast = startOfDay(date) < startOfDay(today);
             return (
               <DayColumn
@@ -490,7 +730,9 @@ export default function Home() {
                 isToday={isSameDay(date, today)}
                 isPast={isPast}
                 statusFilter={statusFilter}
+                blockData={blockData}
                 onSlotClick={(slot) => setActiveModal({ date, slot })}
+                onBlockClick={() => setActiveBlockModal({ date })}
               />
             );
           })}
@@ -508,6 +750,16 @@ export default function Home() {
           dayData={weekData[formatDateParam(activeModal.date)] || emptyDay()}
           onClose={() => setActiveModal(null)}
           onSave={(payload) => handleSaveSlot(activeModal.date, activeModal.slot, payload)}
+          saving={saving}
+        />
+      )}
+
+      {activeBlockModal && (
+        <BlockModal
+          date={activeBlockModal.date}
+          blockData={weekBlocks[formatDateParam(activeBlockModal.date)] || emptyBlock()}
+          onClose={() => setActiveBlockModal(null)}
+          onSave={(payload) => handleSaveBlock(activeBlockModal.date, payload)}
           saving={saving}
         />
       )}

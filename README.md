@@ -12,6 +12,8 @@ Calendario semanal (lunes a viernes) para gestionar turnos compartidos entre vos
 - **Los cambios que hace una persona se reflejan en la vista de la otra** porque ambas leen y escriben sobre la misma base de datos (no en el navegador local). La app actualiza la vista automáticamente cada 8 segundos.
 - Diseño responsive: en pantallas chicas la grilla de 5 días pasa a 2 columnas, y a 1 columna en celulares angostos.
 - Modo oscuro automático, según la preferencia del sistema operativo/navegador (no requiere configuración manual).
+- Filtro por estado: se puede mostrar solo los turnos disponibles, ofrecidos o agendados de toda la semana.
+- Bloqueo de días completos (por ejemplo feriados): cada columna tiene un checkbox "Bloquear día" que, al activarse, pide un motivo y deja el día marcado visualmente como bloqueado, ocultando los horarios. Se puede desactivar en cualquier momento desde el mismo checkbox, por si se bloqueó por error.
 
 ## Base de datos: Upstash Redis (vía Vercel Marketplace)
 
