@@ -368,8 +368,17 @@ export default function Home() {
         Calendario de turnos
       </h1>
 
-      <div className="week-nav" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-        <div className="week-nav-buttons">
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 12,
+          marginBottom: 24,
+        }}
+      >
+        <div style={{ fontSize: 17, fontWeight: 500, color: "var(--text-primary)" }}>{weekLabel}</div>
+        <div className="week-nav-buttons" style={{ display: "flex", gap: 8 }}>
           <button
             onClick={() => setMonday(addDays(monday, -7))}
             style={{
@@ -399,7 +408,6 @@ export default function Home() {
             Siguiente →
           </button>
         </div>
-        <div style={{ fontSize: 16, fontWeight: 500, color: "var(--text-primary)", textAlign: "center" }}>{weekLabel}</div>
       </div>
 
       {errorMsg && (

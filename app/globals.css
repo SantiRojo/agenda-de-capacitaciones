@@ -72,15 +72,6 @@ input, select {
 }
 
 @media (max-width: 480px) {
-  .week-nav {
-    flex-direction: column;
-    gap: 10px;
-    align-items: stretch;
-  }
-  .week-nav-buttons {
-    display: flex;
-    gap: 8px;
-  }
   .week-nav-buttons button {
     flex: 1;
   }
