@@ -601,6 +601,7 @@ export default function Home() {
   })();
 
   const today = new Date();
+  const isCurrentWeek = isSameDay(monday, getMonday(today));
 
   return (
     <div style={{ maxWidth: 800, margin: "0 auto", padding: "1.25rem 1rem" }}>
@@ -633,8 +634,28 @@ export default function Home() {
         >
           ← Anterior
         </button>
-        <div style={{ fontSize: 17, fontWeight: 500, color: "var(--text-primary)", textAlign: "center" }}>
-          {weekLabel}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+          <div style={{ fontSize: 17, fontWeight: 500, color: "var(--text-primary)", textAlign: "center" }}>
+            {weekLabel}
+          </div>
+          {!isCurrentWeek && (
+            <button
+              onClick={() => setMonday(getMonday(new Date()))}
+              style={{
+                padding: "4px 12px",
+                borderRadius: 20,
+                border: "1px solid var(--accent-fill)",
+                background: "var(--accent-bg)",
+                color: "var(--accent-text)",
+                cursor: "pointer",
+                fontSize: 12,
+                fontWeight: 500,
+                whiteSpace: "nowrap",
+              }}
+            >
+              Ir a hoy
+            </button>
+          )}
         </div>
         <button
           onClick={() => setMonday(addDays(monday, 7))}
