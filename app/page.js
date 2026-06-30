@@ -501,6 +501,52 @@ function DayColumn({ date, dayName, dayData, isToday, isPast, statusFilter, bloc
   );
 }
 
+function ThemeSwitch() {
+  const [theme, setTheme] = useState(null);
+
+  useEffect(() => {
+    let saved = null;
+    try {
+      saved = localStorage.getItem("theme");
+    } catch (e) {}
+    if (saved === "light" || saved === "dark") {
+      setTheme(saved);
+    } else {
+      const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setTheme(prefersDark ? "dark" : "light");
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const next = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    document.documentElement.setAttribute("data-theme", next);
+    try {
+      localStorage.setItem("theme", next);
+    } catch (e) {}
+  };
+
+  if (theme === null) {
+    return <div style={{ width: 44, height: 24 }} />;
+  }
+
+  const isDark = theme === "dark";
+
+  return (
+    <button
+      className="theme-switch"
+      data-checked={isDark}
+      onClick={toggleTheme}
+      title={isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+      aria-label={isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+    >
+      <span className="theme-switch-knob" aria-hidden="true">
+        {isDark ? "🌙" : "☀️"}
+      </span>
+    </button>
+  );
+}
+
 export default function Home() {
   const [monday, setMonday] = useState(() => getMonday(new Date()));
   const [weekData, setWeekData] = useState({});
@@ -604,7 +650,11 @@ export default function Home() {
   const isCurrentWeek = isSameDay(monday, getMonday(today));
 
   return (
-    <div style={{ maxWidth: 800, margin: "0 auto", padding: "1.25rem 1rem" }}>
+    <div style={{ maxWidth: 800, margin: "0 auto", padding: "1.25rem 1rem", position: "relative" }}>
+      <div style={{ position: "absolute", top: "1.25rem", right: "1rem", zIndex: 10 }}>
+        <ThemeSwitch />
+      </div>
+
       <h1 style={{ fontSize: 20, fontWeight: 500, color: "var(--text-primary)", marginBottom: 20, textAlign: "center" }}>
         Horarios para meets
       </h1>
