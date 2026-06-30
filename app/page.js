@@ -188,7 +188,13 @@ function Modal({ date, slot, dayData, onClose, onSave, saving }) {
   );
 }
 
-function DayColumn({ date, dayName, dayData, isToday, isPast, onSlotClick }) {
+function DayColumn({ date, dayName, dayData, isToday, isPast, statusFilter, onSlotClick }) {
+  const visibleSlots = SLOTS.filter((slot) => {
+    if (statusFilter === "todos") return true;
+    const s = dayData[slot] || { status: "disponible" };
+    return s.status === statusFilter;
+  });
+
   return (
     <div
       style={{
@@ -235,7 +241,13 @@ function DayColumn({ date, dayName, dayData, isToday, isPast, onSlotClick }) {
         </div>
       </div>
 
-      {SLOTS.map((slot) => {
+      {visibleSlots.length === 0 && (
+        <div style={{ fontSize: 12, color: "var(--text-muted)", textAlign: "center", padding: "16px 10px" }}>
+          Sin turnos en este estado
+        </div>
+      )}
+
+      {visibleSlots.map((slot) => {
         const s = dayData[slot] || { status: "disponible", legajo: "" };
         const meta = STATUS_META[s.status];
         return (
@@ -298,6 +310,7 @@ export default function Home() {
   const [activeModal, setActiveModal] = useState(null);
   const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [statusFilter, setStatusFilter] = useState("todos");
   const mondayRef = useRef(monday);
   mondayRef.current = monday;
 
@@ -364,50 +377,83 @@ export default function Home() {
 
   return (
     <div style={{ maxWidth: 800, margin: "0 auto", padding: "1.25rem 1rem" }}>
-      <h1 style={{ fontSize: 20, fontWeight: 500, color: "var(--text-primary)", marginBottom: 20 }}>
-        Calendario de turnos
+      <h1 style={{ fontSize: 20, fontWeight: 500, color: "var(--text-primary)", marginBottom: 20, textAlign: "center" }}>
+        Horarios para meets
       </h1>
 
       <div
+        className="week-nav-row"
         style={{
           display: "flex",
-          flexDirection: "column",
           alignItems: "center",
+          justifyContent: "space-between",
           gap: 12,
-          marginBottom: 24,
+          marginBottom: 16,
         }}
       >
-        <div style={{ fontSize: 17, fontWeight: 500, color: "var(--text-primary)" }}>{weekLabel}</div>
-        <div className="week-nav-buttons" style={{ display: "flex", gap: 8 }}>
-          <button
-            onClick={() => setMonday(addDays(monday, -7))}
-            style={{
-              padding: "8px 14px",
-              borderRadius: 8,
-              border: "1px solid var(--input-border)",
-              background: "var(--bg-card)",
-              color: "var(--text-primary)",
-              cursor: "pointer",
-              fontSize: 14,
-            }}
-          >
-            ← Anterior
-          </button>
-          <button
-            onClick={() => setMonday(addDays(monday, 7))}
-            style={{
-              padding: "8px 14px",
-              borderRadius: 8,
-              border: "1px solid var(--input-border)",
-              background: "var(--bg-card)",
-              color: "var(--text-primary)",
-              cursor: "pointer",
-              fontSize: 14,
-            }}
-          >
-            Siguiente →
-          </button>
+        <button
+          onClick={() => setMonday(addDays(monday, -7))}
+          style={{
+            padding: "8px 14px",
+            borderRadius: 8,
+            border: "1px solid var(--input-border)",
+            background: "var(--bg-card)",
+            color: "var(--text-primary)",
+            cursor: "pointer",
+            fontSize: 14,
+            whiteSpace: "nowrap",
+          }}
+        >
+          ← Anterior
+        </button>
+        <div style={{ fontSize: 17, fontWeight: 500, color: "var(--text-primary)", textAlign: "center" }}>
+          {weekLabel}
         </div>
+        <button
+          onClick={() => setMonday(addDays(monday, 7))}
+          style={{
+            padding: "8px 14px",
+            borderRadius: 8,
+            border: "1px solid var(--input-border)",
+            background: "var(--bg-card)",
+            color: "var(--text-primary)",
+            cursor: "pointer",
+            fontSize: 14,
+            whiteSpace: "nowrap",
+          }}
+        >
+          Siguiente →
+        </button>
+      </div>
+
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 24, flexWrap: "wrap" }}>
+        <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>Mostrar:</span>
+        {["todos", "disponible", "ofrecido", "agendado"].map((opt) => {
+          const isActive = statusFilter === opt;
+          const meta = opt === "todos" ? null : STATUS_META[opt];
+          return (
+            <button
+              key={opt}
+              onClick={() => setStatusFilter(opt)}
+              style={{
+                padding: "6px 12px",
+                borderRadius: 20,
+                border: isActive ? "1px solid var(--accent-fill)" : "1px solid var(--input-border)",
+                background: isActive ? "var(--accent-bg)" : "var(--bg-card)",
+                color: isActive ? "var(--accent-text)" : "var(--text-secondary)",
+                cursor: "pointer",
+                fontSize: 13,
+                fontWeight: isActive ? 500 : 400,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
+              }}
+            >
+              {meta && <span aria-hidden="true">{meta.emoji}</span>}
+              {opt === "todos" ? "Todos" : meta.label}
+            </button>
+          );
+        })}
       </div>
 
       {errorMsg && (
@@ -443,6 +489,7 @@ export default function Home() {
                 dayData={dayData}
                 isToday={isSameDay(date, today)}
                 isPast={isPast}
+                statusFilter={statusFilter}
                 onSlotClick={(slot) => setActiveModal({ date, slot })}
               />
             );

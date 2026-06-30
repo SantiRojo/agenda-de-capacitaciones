@@ -76,3 +76,13 @@ input, select {
     flex: 1;
   }
 }
+
+@media (max-width: 460px) {
+  .week-nav-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .week-nav-row button {
+    width: 100%;
+  }
+}
