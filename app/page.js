@@ -381,12 +381,36 @@ function DayColumn({ date, dayName, dayData, isToday, isPast, statusFilter, bloc
     >
       <div
         style={{
+          position: "relative",
           padding: "10px 10px 8px",
           borderBottom: "1px solid var(--border-color)",
           textAlign: "center",
           background: isToday ? "var(--accent-bg)" : "transparent",
         }}
       >
+        <button
+          onClick={onBlockClick}
+          disabled={isPast}
+          title={blockData.blocked ? "Habilitar día" : "Bloquear día"}
+          aria-label={blockData.blocked ? "Habilitar día" : "Bloquear día"}
+          style={{
+            position: "absolute",
+            top: 6,
+            right: 6,
+            width: 22,
+            height: 22,
+            padding: 0,
+            border: "none",
+            background: "transparent",
+            fontSize: 14,
+            lineHeight: 1,
+            cursor: isPast ? "not-allowed" : "pointer",
+            opacity: isPast ? 0.4 : 1,
+          }}
+        >
+          <span aria-hidden="true">{blockData.blocked ? "❇️" : "🚫"}</span>
+        </button>
+
         <div
           style={{
             fontSize: 12,
@@ -414,30 +438,6 @@ function DayColumn({ date, dayName, dayData, isToday, isPast, statusFilter, bloc
           {date.getDate()}
         </div>
       </div>
-
-      <label
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 6,
-          padding: "8px 10px",
-          borderBottom: "1px solid var(--border-color)",
-          fontSize: 11,
-          color: blockData.blocked ? "var(--error-text)" : "var(--text-secondary)",
-          cursor: isPast ? "not-allowed" : "pointer",
-          background: blockData.blocked ? "var(--error-bg)" : "transparent",
-        }}
-      >
-        <input
-          type="checkbox"
-          checked={blockData.blocked}
-          disabled={isPast}
-          onChange={onBlockClick}
-          style={{ cursor: isPast ? "not-allowed" : "pointer" }}
-        />
-        Bloquear día
-      </label>
 
       {blockData.blocked ? (
         <div style={{ padding: "16px 10px", textAlign: "center" }}>
