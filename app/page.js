@@ -74,23 +74,44 @@ function Modal({ date, slot, dayData, onClose, onSave, saving }) {
       style={{
         position: "fixed",
         inset: 0,
-        background: "rgba(0,0,0,0.4)",
+        background: "rgba(0,0,0,0.5)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         zIndex: 100,
+        padding: 16,
       }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div style={{ background: "#fff", border: "1px solid #e5e3dc", borderRadius: 16, padding: 24, width: 320, maxWidth: "92vw" }}>
-        <div style={{ fontSize: 17, fontWeight: 500, color: "#1a1a18", marginBottom: 4 }}>{slot} hs</div>
-        <div style={{ fontSize: 13, color: "#6b6a64", marginBottom: 20 }}>{dateStr}</div>
+      <div
+        style={{
+          background: "var(--modal-bg)",
+          border: "1px solid var(--border-color)",
+          borderRadius: 16,
+          padding: 24,
+          width: 320,
+          maxWidth: "100%",
+        }}
+      >
+        <div style={{ fontSize: 17, fontWeight: 500, color: "var(--text-primary)", marginBottom: 4 }}>{slot} hs</div>
+        <div style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 20 }}>{dateStr}</div>
 
-        <label style={{ fontSize: 13, color: "#6b6a64", marginBottom: 6, display: "block" }}>Estado del turno</label>
+        <label style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 6, display: "block" }}>
+          Estado del turno
+        </label>
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          style={{ width: "100%", marginBottom: 16, padding: "8px 10px", fontSize: 14, borderRadius: 8, border: "1px solid #d4d2c9" }}
+          style={{
+            width: "100%",
+            marginBottom: 16,
+            padding: "10px 10px",
+            fontSize: 16,
+            borderRadius: 8,
+            border: "1px solid var(--input-border)",
+            background: "var(--bg-card)",
+            color: "var(--text-primary)",
+          }}
         >
           <option value="disponible">📭 Disponible</option>
           <option value="ofrecido">⛔️ Ofrecido</option>
@@ -99,7 +120,9 @@ function Modal({ date, slot, dayData, onClose, onSave, saving }) {
 
         {status !== "disponible" && (
           <>
-            <label style={{ fontSize: 13, color: "#6b6a64", marginBottom: 6, display: "block" }}>Legajo del cliente</label>
+            <label style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 6, display: "block" }}>
+              Legajo del cliente
+            </label>
             <input
               type="text"
               value={legajo}
@@ -116,10 +139,12 @@ function Modal({ date, slot, dayData, onClose, onSave, saving }) {
               style={{
                 width: "100%",
                 marginBottom: 16,
-                padding: "8px 10px",
-                fontSize: 14,
+                padding: "10px 10px",
+                fontSize: 16,
                 borderRadius: 8,
-                border: error ? "1px solid #c43d3d" : "1px solid #d4d2c9",
+                border: error ? "1px solid var(--error-text)" : "1px solid var(--input-border)",
+                background: "var(--bg-card)",
+                color: "var(--text-primary)",
               }}
             />
           </>
@@ -128,7 +153,15 @@ function Modal({ date, slot, dayData, onClose, onSave, saving }) {
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
           <button
             onClick={onClose}
-            style={{ padding: "7px 16px", borderRadius: 8, border: "1px solid #d4d2c9", background: "transparent", fontSize: 14, cursor: "pointer" }}
+            style={{
+              padding: "9px 16px",
+              borderRadius: 8,
+              border: "1px solid var(--input-border)",
+              background: "transparent",
+              color: "var(--text-primary)",
+              fontSize: 14,
+              cursor: "pointer",
+            }}
           >
             Cancelar
           </button>
@@ -136,10 +169,10 @@ function Modal({ date, slot, dayData, onClose, onSave, saving }) {
             onClick={handleSave}
             disabled={saving}
             style={{
-              padding: "7px 16px",
+              padding: "9px 16px",
               borderRadius: 8,
               border: "none",
-              background: "#378ADD",
+              background: "var(--accent-fill)",
               color: "#fff",
               fontSize: 14,
               fontWeight: 500,
@@ -159,8 +192,8 @@ function DayColumn({ date, dayName, dayData, isToday, isPast, onSlotClick }) {
   return (
     <div
       style={{
-        background: "#fff",
-        border: "1px solid #e5e3dc",
+        background: "var(--bg-card)",
+        border: "1px solid var(--border-color)",
         borderRadius: 12,
         overflow: "hidden",
         opacity: isPast ? 0.55 : 1,
@@ -169,9 +202,9 @@ function DayColumn({ date, dayName, dayData, isToday, isPast, onSlotClick }) {
       <div
         style={{
           padding: "10px 10px 8px",
-          borderBottom: "1px solid #e5e3dc",
+          borderBottom: "1px solid var(--border-color)",
           textAlign: "center",
-          background: isToday ? "#E6F1FB" : "transparent",
+          background: isToday ? "var(--accent-bg)" : "transparent",
         }}
       >
         <div
@@ -180,15 +213,26 @@ function DayColumn({ date, dayName, dayData, isToday, isPast, onSlotClick }) {
             fontWeight: 500,
             textTransform: "uppercase",
             letterSpacing: "0.04em",
-            color: isToday ? "#185FA5" : "#6b6a64",
+            color: isToday ? "var(--accent-text)" : "var(--text-secondary)",
           }}
         >
           {dayName}
           {isToday && (
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#378ADD", display: "inline-block", marginLeft: 4 }} />
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: "var(--accent-fill)",
+                display: "inline-block",
+                marginLeft: 4,
+              }}
+            />
           )}
         </div>
-        <div style={{ fontSize: 20, fontWeight: 500, color: isToday ? "#185FA5" : "#1a1a18" }}>{date.getDate()}</div>
+        <div style={{ fontSize: 20, fontWeight: 500, color: isToday ? "var(--accent-text)" : "var(--text-primary)" }}>
+          {date.getDate()}
+        </div>
       </div>
 
       {SLOTS.map((slot) => {
@@ -199,12 +243,12 @@ function DayColumn({ date, dayName, dayData, isToday, isPast, onSlotClick }) {
             key={slot}
             onClick={() => !isPast && onSlotClick(slot)}
             style={{
-              padding: "8px 10px",
-              borderBottom: "1px solid #e5e3dc",
+              padding: "10px 10px",
+              borderBottom: "1px solid var(--border-color)",
               cursor: isPast ? "not-allowed" : "pointer",
             }}
           >
-            <div style={{ fontSize: 13, fontWeight: 500, color: "#1a1a18", marginBottom: 4 }}>
+            <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text-primary)", marginBottom: 4 }}>
               {slot} {isPast && "🔒"}
             </div>
             <span
@@ -223,13 +267,23 @@ function DayColumn({ date, dayName, dayData, isToday, isPast, onSlotClick }) {
               <span aria-hidden="true">{meta.emoji}</span>
               {meta.label}
             </span>
-            {s.legajo && <div style={{ fontSize: 11, color: "#6b6a64", marginTop: 3 }}>👤 {s.legajo}</div>}
+            {s.legajo && (
+              <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 3 }}>👤 {s.legajo}</div>
+            )}
           </div>
         );
       })}
 
       {isPast && (
-        <div style={{ fontSize: 10, color: "#9c9a91", textAlign: "center", padding: 6, borderTop: "1px solid #e5e3dc" }}>
+        <div
+          style={{
+            fontSize: 10,
+            color: "var(--text-muted)",
+            textAlign: "center",
+            padding: 6,
+            borderTop: "1px solid var(--border-color)",
+          }}
+        >
           🔒 Día finalizado
         </div>
       )}
@@ -309,35 +363,66 @@ export default function Home() {
   const today = new Date();
 
   return (
-    <div style={{ maxWidth: 800, margin: "0 auto", padding: "1.5rem 1rem" }}>
-      <h1 style={{ fontSize: 20, fontWeight: 500, color: "#1a1a18", marginBottom: 20 }}>Calendario de turnos</h1>
+    <div style={{ maxWidth: 800, margin: "0 auto", padding: "1.25rem 1rem" }}>
+      <h1 style={{ fontSize: 20, fontWeight: 500, color: "var(--text-primary)", marginBottom: 20 }}>
+        Calendario de turnos
+      </h1>
 
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-        <button
-          onClick={() => setMonday(addDays(monday, -7))}
-          style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid #d4d2c9", background: "#fff", cursor: "pointer", fontSize: 14 }}
-        >
-          ← Anterior
-        </button>
-        <div style={{ fontSize: 16, fontWeight: 500, color: "#1a1a18" }}>{weekLabel}</div>
-        <button
-          onClick={() => setMonday(addDays(monday, 7))}
-          style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid #d4d2c9", background: "#fff", cursor: "pointer", fontSize: 14 }}
-        >
-          Siguiente →
-        </button>
+      <div className="week-nav" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+        <div className="week-nav-buttons">
+          <button
+            onClick={() => setMonday(addDays(monday, -7))}
+            style={{
+              padding: "8px 14px",
+              borderRadius: 8,
+              border: "1px solid var(--input-border)",
+              background: "var(--bg-card)",
+              color: "var(--text-primary)",
+              cursor: "pointer",
+              fontSize: 14,
+            }}
+          >
+            ← Anterior
+          </button>
+          <button
+            onClick={() => setMonday(addDays(monday, 7))}
+            style={{
+              padding: "8px 14px",
+              borderRadius: 8,
+              border: "1px solid var(--input-border)",
+              background: "var(--bg-card)",
+              color: "var(--text-primary)",
+              cursor: "pointer",
+              fontSize: 14,
+            }}
+          >
+            Siguiente →
+          </button>
+        </div>
+        <div style={{ fontSize: 16, fontWeight: 500, color: "var(--text-primary)", textAlign: "center" }}>{weekLabel}</div>
       </div>
 
       {errorMsg && (
-        <div style={{ background: "#FCEBEB", color: "#A32D2D", fontSize: 13, padding: "8px 12px", borderRadius: 8, marginBottom: 12 }}>
+        <div
+          style={{
+            background: "var(--error-bg)",
+            color: "var(--error-text)",
+            fontSize: 13,
+            padding: "8px 12px",
+            borderRadius: 8,
+            marginBottom: 12,
+          }}
+        >
           {errorMsg}
         </div>
       )}
 
       {loading ? (
-        <div style={{ fontSize: 14, color: "#9c9a91", textAlign: "center", padding: "2rem 0" }}>Cargando turnos…</div>
+        <div style={{ fontSize: 14, color: "var(--text-muted)", textAlign: "center", padding: "2rem 0" }}>
+          Cargando turnos…
+        </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: 8 }}>
+        <div className="week-grid">
           {weekDates.map((date, i) => {
             const key = formatDateParam(date);
             const dayData = weekData[key] || emptyDay();
@@ -357,7 +442,7 @@ export default function Home() {
         </div>
       )}
 
-      <div style={{ fontSize: 12, color: "#9c9a91", textAlign: "center", marginTop: 20 }}>
+      <div style={{ fontSize: 12, color: "var(--text-muted)", textAlign: "center", marginTop: 20 }}>
         Los cambios se sincronizan automáticamente cada {POLL_INTERVAL_MS / 1000} segundos.
       </div>
 

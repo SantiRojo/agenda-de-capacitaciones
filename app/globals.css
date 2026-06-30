@@ -1,0 +1,87 @@
+:root {
+  --bg-page: #F4F3EF;
+  --bg-card: #FFFFFF;
+  --border-color: #E5E3DC;
+  --text-primary: #1A1A18;
+  --text-secondary: #6B6A64;
+  --text-muted: #9C9A91;
+  --accent-bg: #E6F1FB;
+  --accent-text: #185FA5;
+  --accent-fill: #378ADD;
+  --input-border: #D4D2C9;
+  --modal-bg: #FFFFFF;
+  --error-bg: #FCEBEB;
+  --error-text: #A32D2D;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-page: #15151388;
+    --bg-page: #131311;
+    --bg-card: #1E1E1B;
+    --border-color: #34332E;
+    --text-primary: #F2F1EC;
+    --text-secondary: #ADABA2;
+    --text-muted: #76746C;
+    --accent-bg: #0C447C;
+    --accent-text: #B5D4F4;
+    --accent-fill: #4A95E0;
+    --input-border: #3D3C36;
+    --modal-bg: #1E1E1B;
+    --error-bg: #501313;
+    --error-text: #F7C1C1;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg-page);
+  color: var(--text-primary);
+}
+
+button {
+  font-family: inherit;
+}
+
+input, select {
+  font-family: inherit;
+}
+
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+@media (max-width: 720px) {
+  .week-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+}
+
+@media (max-width: 420px) {
+  .week-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .week-nav {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+  .week-nav-buttons {
+    display: flex;
+    gap: 8px;
+  }
+  .week-nav-buttons button {
+    flex: 1;
+  }
+}

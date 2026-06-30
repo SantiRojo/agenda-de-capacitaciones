@@ -10,6 +10,8 @@ Calendario semanal (lunes a viernes) para gestionar turnos compartidos entre vos
 - Reset automático: todo turno en "Ofrecido" que no se cambie antes de las 19:00 (hora del servidor) vuelve a "Disponible".
 - Los días pasados quedan bloqueados para edición.
 - **Los cambios que hace una persona se reflejan en la vista de la otra** porque ambas leen y escriben sobre la misma base de datos (no en el navegador local). La app actualiza la vista automáticamente cada 8 segundos.
+- Diseño responsive: en pantallas chicas la grilla de 5 días pasa a 2 columnas, y a 1 columna en celulares angostos.
+- Modo oscuro automático, según la preferencia del sistema operativo/navegador (no requiere configuración manual).
 
 ## Base de datos: Upstash Redis (vía Vercel Marketplace)
 
