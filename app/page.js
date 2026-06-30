@@ -243,21 +243,9 @@ function BlockModal({ date, blockData, onClose, onSave, saving }) {
 
         {blockData.blocked ? (
           <>
-            <label style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 6, display: "block" }}>
-              Motivo actual
-            </label>
-            <div
-              style={{
-                fontSize: 14,
-                color: "var(--text-primary)",
-                background: "var(--bg-page)",
-                border: "1px solid var(--border-color)",
-                borderRadius: 8,
-                padding: "10px 10px",
-                marginBottom: 16,
-              }}
-            >
-              {blockData.reason}
+            <div style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 16 }}>
+              <span>Motivo actual: </span>
+              <span style={{ color: "var(--text-primary)", fontWeight: 500 }}>{blockData.reason}</span>
             </div>
             <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
               <button
@@ -339,17 +327,17 @@ function BlockModal({ date, blockData, onClose, onSave, saving }) {
               </button>
               <button
                 onClick={handleBlock}
-                disabled={saving}
+                disabled={saving || !reason.trim()}
                 style={{
                   padding: "9px 16px",
                   borderRadius: 8,
                   border: "none",
-                  background: "var(--error-text)",
+                  background: "#C43D3D",
                   color: "#fff",
                   fontSize: 14,
                   fontWeight: 500,
-                  cursor: saving ? "default" : "pointer",
-                  opacity: saving ? 0.6 : 1,
+                  cursor: saving || !reason.trim() ? "default" : "pointer",
+                  opacity: saving || !reason.trim() ? 0.4 : 1,
                 }}
               >
                 {saving ? "Guardando…" : "Bloquear día"}
